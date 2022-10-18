@@ -20,6 +20,16 @@ router.get('/', (req, res) => {
  */
 router.post('/', (req, res) => {
   // endpoint functionality
+  if(req.isAuthenticated()){
+    const queryText = `INSERT INTO "item" ("description", "image_url", "user_id") VALUES ($1, $2, $3)`;
+    pool.query(queryText, [req.body.name, req.body.image, req.user.id]).then(() => {
+      res.sendStatus(201);
+    }).catch((e) => {
+      res.sendStatus(500)
+    })
+  } else {
+    res.sendStatus(403); 
+  }
 });
 
 /**
@@ -27,6 +37,17 @@ router.post('/', (req, res) => {
  */
 router.delete('/:id', (req, res) => {
   // endpoint functionality
+  console.log('id', req.params.id)
+  if (req.isAuthenticated()){
+    const queryText = `DELETE FROM "item" WHERE "id" = $1 AND "user_id" = $2`
+    pool.query(queryText, [req.params.id, req.user.id]).then(() => {
+      res.sendStatus(201)
+    }).catch((e) => {
+      res.sendStatus(500)
+    })
+  } else {
+    res.sendStatus(403);
+  }
 });
 
 module.exports = router;

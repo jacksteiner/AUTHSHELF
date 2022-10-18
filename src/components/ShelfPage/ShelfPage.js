@@ -4,6 +4,8 @@ import './ShelfPage.css';
 
 function ShelfPage() {
   const [shelfList, setShelfList] = useState([]);
+  const [itemName, setItemName] = useState('');
+  const [itemImage, setItemImage] = useState('');
 
   useEffect(() => {
     fetchPets();
@@ -18,8 +20,35 @@ function ShelfPage() {
     });
   }
 
+  const addNewItem = (e) => {
+    e.preventDefault();
+    axios.post('/api/shelf', {name: itemName, image:itemImage}).then(() =>{
+      fetchPets();
+    }).catch((e) => {
+      console.log(e);
+      alert('Something went wrong.');
+    })
+  }
+
+  const deleteItem = (itemId) => {
+    axios.delete(`/api/shelf/${itemId}`).then(() => {
+      fetchPets();
+    }).catch((e) => {
+      console.log(e)
+      alert('Something went wrong.')
+    })
+  }
+
   return (
     <div className="container">
+      <div>
+        <h2>Add Item to Shelf</h2>
+        <form onSubmit={addNewItem}>
+          <input value={itemName} onChange={(e) => setItemName(e.target.value)} type="text" />
+          <input value={itemImage} onChange={(e) => setItemImage(e.target.value)} type="text" />
+          <input type="submit" />
+        </form>
+      </div>
       <h2>Shelf</h2>
       <p>All of the available items can be seen here.</p>
       {
@@ -35,7 +64,7 @@ function ShelfPage() {
                         <br />
                         <div className="desc">{item.description}</div>
                         <div style={{textAlign: 'center', padding: '5px'}}>
-                          <button style={{cursor: 'pointer'}}>Delete</button>
+                          <button onClick={() => deleteItem(item.id)} style={{cursor: 'pointer'}}>Delete</button>
                         </div>
                     </div>
                  </div>
